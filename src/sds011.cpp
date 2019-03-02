@@ -22,7 +22,6 @@ int8_t Sds011::cmd_data_report()
     int8_t r;
 
     packet_init(packet);
-    packet.command = 0xB4;
     packet.data[0] = 2;
     packet.data[1] = SETUP_GET;
 
@@ -44,7 +43,6 @@ int8_t Sds011::cmd_data_report(uint8_t mode){
     int8_t r;
 
     packet_init(packet);
-    packet.command = 0xB4;
     packet.data[0] = 2;
     packet.data[1] = SETUP_SET;
     packet.data[2] = mode;
@@ -69,7 +67,6 @@ int8_t Sds011::cmd_data_query(float& pm25, float& pm10)
     int8_t r;
 
     packet_init(packet);
-    packet.command = 0xB4;
     packet.data[0] = 4;
 
     packet_send(packet);
@@ -95,7 +92,6 @@ int8_t Sds011::cmd_sleep()
     int8_t r;
 
     packet_init(packet);
-    packet.command = 0xB4;
     packet.data[0] = 6;
     packet.data[1] = SETUP_GET;
 
@@ -118,7 +114,6 @@ int8_t Sds011::cmd_sleep(uint8_t mode)
     int8_t r;
 
     packet_init(packet);
-    packet.command = 0xB4;
     packet.data[0] = 6;
     packet.data[1] = SETUP_SET;
     packet.data[2] = mode;
@@ -143,7 +138,6 @@ int8_t Sds011::cmd_working_period()
     int8_t r;
 
     packet_init(packet);
-    packet.command = 0xB4;
     packet.data[0] = 8;
     packet.data[1] = SETUP_GET;
 
@@ -168,7 +162,6 @@ int8_t Sds011::cmd_working_period(uint8_t interval)
     int8_t r;
 
     packet_init(packet);
-    packet.command = 0xB4;
     packet.data[0] = 8;
     packet.data[1] = SETUP_SET;
     packet.data[2] = interval;
@@ -189,6 +182,7 @@ void Sds011::packet_init(packet_out& packet)
 {
     packet = {0};
     packet.head = 0xAA;
+    packet.command = 0xB4;
     packet.tail = 0xAB;
     // All devices
     packet.data[13] = 0xFF;

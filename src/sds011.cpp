@@ -248,8 +248,8 @@ int8_t Sds011::packet_read(packet_in& packet)
         }
         if (count == sizeof(packet)) break;
 
-        bit += chank;
-        delay(chank);
+        bit += chunk;
+        delay(chunk);
     };
 
     if (count != sizeof(packet))

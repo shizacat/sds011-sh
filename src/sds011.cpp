@@ -13,6 +13,15 @@ void Sds011::begin()
 }
 
 /**
+ * Flush in buffer
+ */
+void Sds011::flush_in_buffer(){
+    while (device_serial.available() > 0) {
+        device_serial.read();
+    }
+};
+
+/**
  * Get data reporting mode
  */
 int8_t Sds011::cmd_data_report()
@@ -29,7 +38,7 @@ int8_t Sds011::cmd_data_report()
     r = packet_read(answer);
 
     if (r != 0) return r;
-    if (answer.command != 0xC5) return -3;
+    if (answer.command != 0xC5) return -4;
 
     return answer.data[2];
 }
@@ -51,7 +60,7 @@ int8_t Sds011::cmd_data_report(uint8_t mode){
     r = packet_read(answer);
 
     if (r != 0) return r;
-    if (answer.command != 0xC5) return -3;
+    if (answer.command != 0xC5) return -4;
 
     return 0;
 }
@@ -73,7 +82,7 @@ int8_t Sds011::cmd_data_query(float& pm25, float& pm10)
     r = packet_read(answer);
 
     if (r != 0) return r;
-    if (answer.command != 0xC0) return -3;
+    if (answer.command != 0xC0) return -4;
 
     // convert
     pm25 = (float) ((answer.data[1]<<8) + answer.data[0]) / 10.0;
@@ -99,7 +108,7 @@ int8_t Sds011::cmd_sleep()
     r = packet_read(answer);
 
     if (r != 0) return r;
-    if (answer.command != 0xC5) return -3;
+    if (answer.command != 0xC5) return -4;
 
     return answer.data[2];
 }
@@ -122,7 +131,7 @@ int8_t Sds011::cmd_sleep(uint8_t mode)
     r = packet_read(answer);
 
     if (r != 0) return r;
-    if (answer.command != 0xC5) return -3;
+    if (answer.command != 0xC5) return -4;
 
     return 0;
 }
@@ -145,7 +154,7 @@ int8_t Sds011::cmd_working_period()
     r = packet_read(answer);
 
     if (r != 0) return r;
-    if (answer.command != 0xC5) return -3;
+    if (answer.command != 0xC5) return -4;
 
     return answer.data[2];
 }
@@ -170,7 +179,7 @@ int8_t Sds011::cmd_working_period(uint8_t interval)
     r = packet_read(answer);
 
     if (r != 0) return r;
-    if (answer.command != 0xC5) return -3;
+    if (answer.command != 0xC5) return -4;
 
     return 0;
 }
@@ -222,24 +231,36 @@ void Sds011::packet_send(packet_out& packet)
  */
 int8_t Sds011::packet_read(packet_in& packet)
 {
+    int timeout = 3000; // ms
+    int bit = 0; //
+    int chunk = int(timeout/10); //
+
     uint8_t count = 0;
     uint8_t checksum = 0;
 
     uint8_t* p = (uint8_t*) &packet;
 
-    while (count != sizeof(packet)){
-        if (device_serial.available() > 0) {
+    while (bit < timeout){
+        while (device_serial.available() > 0) {
             p[count] = device_serial.read();
             count += 1;
+            if (count == sizeof(packet)) break;
         }
-    }
+        if (count == sizeof(packet)) break;
+
+        bit += chank;
+        delay(chank);
+    };
+
+    if (count != sizeof(packet))
+        return -1;
 
     for (uint8_t i=0; i < sizeof(packet.data); i++){
         checksum += packet.data[i];
     }
 
     if (checksum != packet.checksum) return -2;
-    if ((packet.head != 0xAA) || (packet.tail != 0xAB)) return -1;
+    if ((packet.head != 0xAA) || (packet.tail != 0xAB)) return -3;
 
     return 0;
 }

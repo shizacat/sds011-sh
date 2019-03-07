@@ -39,6 +39,7 @@ public:
   Sds011(USARTSerial& serial): device_serial(serial) {};
 
   void begin();
+  void flush_in_buffer();
 
   int8_t cmd_data_report();  // get
   int8_t cmd_data_report(uint8_t mode); // set

@@ -1,7 +1,7 @@
 /* sds011 library by Alexey M
  */
 
-#include "sds011.h"
+#include "sds011-sh.h"
 
 /**
  * Methods

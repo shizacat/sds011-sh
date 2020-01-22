@@ -11,6 +11,10 @@ A Particle library for sds011 - dust sensor from Nova.
 
 ## Change Log
 
+1.1.2:
+
+- Changed names of file to sds011-sh.*
+
 1.1.0:
 
 - Added timeout for read packet UART.
